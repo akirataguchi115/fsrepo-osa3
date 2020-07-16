@@ -6,6 +6,7 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 const Person = require('./models/person')
 
+mongoose.set('useFindAndModify', false)
 app.use(cors())
 app.use(express.static('build'))
 morgan.token('content', function (req, res) { return JSON.stringify(req.body) })
@@ -119,6 +120,21 @@ app.get('/api/persons', (req, res) => {
     Person.find({}).then(people => {
         res.json(people)
     })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+    
+    const person = {
+        name: body.name,
+        number: body.number,
+    }
+
+    Person.findByIdAndUpdate(request.params.id, person)
+        .then(updatedPerson => {
+            response.json(updatedPerson)
+        })
+        .catch(error => next(error))
 })
 
 const PORT = process.env.PORT || 3001
