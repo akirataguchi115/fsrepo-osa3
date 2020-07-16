@@ -51,11 +51,13 @@ app.get('/', (req, res) => {
 })
 
 app.get('/info', (req, res) => {
-    res.send(
-        `<div>
-            <p>Phonebook has info for ${persons.length} people</p>
+    Person.count({}, function (err, count) {
+        res.send(
+            `<div>
+            <p>Phonebook has info for ${count} people</p>
             <p>${Date(Date.now).toString()}</p>
         </div>`)
+    })
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -124,7 +126,7 @@ app.get('/api/persons', (req, res) => {
 
 app.put('/api/persons/:id', (request, response, next) => {
     const body = request.body
-    
+
     const person = {
         name: body.name,
         number: body.number,
