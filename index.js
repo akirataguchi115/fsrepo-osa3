@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 const Person = require('./models/person')
 
 mongoose.set('useFindAndModify', false)
+mongoose.set('useCreateIndex', true);
 app.use(cors())
 app.use(express.static('build'))
 morgan.token('content', function (req, res) { return JSON.stringify(req.body) })
@@ -68,20 +69,8 @@ app.delete('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
-
-    if (!body.name || !body.number) {
-        return response.status(400).json({
-            error: 'content missing'
-        })
-    }
-
-    if (persons.find(person => person.name === body.name)) {
-        return response.status(400).json({
-            error: 'name must be unique'
-        })
-    }
 
     const person = new Person({
         name: body.name,
@@ -89,16 +78,20 @@ app.post('/api/persons', (request, response) => {
         id: generateId()
     })
 
-    person.save().then(savedPerson => {
-        response.json(savedPerson)
-    })
+    person.save()
+        .then(savedPerson => {
+            response.json(savedPerson)
+        })
+        .catch(error => next(error))
 })
 
 const errorHandler = (error, request, response, next) => {
-    console.error(error.message)
-
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    if (error.name === 'ValidationError') {
+        return response.status(400).send({ error: 'validation error; check submittable information'})
     }
 
     next(error)
