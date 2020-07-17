@@ -82,22 +82,13 @@ app.post('/api/persons', (request, response, next) => {
         .then(savedPerson => {
             response.json(savedPerson)
         })
-        .catch(error => next(error))
+        .catch(error => {
+            next(error)
+            console.log(error.name)
+        })
 })
 
-const errorHandler = (error, request, response, next) => {
-    if (error.name === 'CastError') {
-        return response.status(400).send({ error: 'malformatted id' })
-    }
 
-    if (error.name === 'ValidationError') {
-        return response.status(400).send({ error: 'validation error; check submittable information'})
-    }
-
-    next(error)
-}
-
-app.use(errorHandler)
 
 app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id)
@@ -131,7 +122,19 @@ app.put('/api/persons/:id', (request, response, next) => {
         })
         .catch(error => next(error))
 })
+const errorHandler = (error, request, response, next) => {
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
 
+    if (error.name === 'ValidationError') {
+        console.log('testi')
+        return response.status(400).json({ error: error.message })
+    }
+    next(error)
+}
+
+app.use(errorHandler)
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
