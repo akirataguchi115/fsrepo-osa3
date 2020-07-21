@@ -20,14 +20,7 @@ app.use(
   )
 )
 
-<<<<<<< HEAD
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-=======
-const url =
-  'mongodb+srv://fullstack:vdkvGY1uRMSqyNdv@cluster0.koatx.mongodb.net/phonebook?retryWrites=true&w=majority'
-
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
->>>>>>> 20364fa343450462b9710cbf47b233c614b3cae5
 
 const generateId = () => {
   const id = Math.floor(Math.random() * 10000000)
